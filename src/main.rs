@@ -1,5 +1,3 @@
-use std::process::Command;
-
 use new_action::{new_action, ActionType};
 use plist::{from_file, to_file_binary, Dictionary, Integer, Value};
 use serde::{Deserialize, Serialize};
