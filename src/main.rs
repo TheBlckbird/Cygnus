@@ -1,7 +1,11 @@
+use std::fs;
+
+use lexer::lexer;
 use new_action::{new_action, ActionType};
 use plist::{from_file, to_file_binary, Dictionary, Integer, Value};
 use serde::{Deserialize, Serialize};
 
+mod lexer;
 mod new_action;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -48,6 +52,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 text: format!("Hello {}!", i),
             }));
     }
+
+    println!(
+        "{:#?}",
+        lexer(&fs::read_to_string("dev_assets/example.scs").unwrap())
+    );
 
     to_file_binary::<_, Workflow>("dev_assets/new.shortcut", &plist)?;
 
