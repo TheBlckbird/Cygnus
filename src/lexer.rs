@@ -1,5 +1,5 @@
 #[allow(clippy::upper_case_acronyms)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Token {
     Symbol { content: String },
     StringLiteral { content: String },
@@ -8,88 +8,107 @@ pub enum Token {
     EOF,
 }
 
-pub fn lexer(input: &str) -> Vec<Token> {
-    let mut i = 0;
-    let mut tokens: Vec<Token> = vec![];
-
-    while i < input.len() - 1 {
-        let current_char = input.chars().nth(i).unwrap();
-        let allowed_identifier_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-
-        let mut token: Option<Token> = None;
-
-        match current_char {
-            '"' => {
-                i += 1;
-                let string_literal = parse_string_literal(input, &mut i);
-                token = Some(Token::StringLiteral {
-                    content: string_literal,
-                });
-            }
-            _ if allowed_identifier_characters.contains(current_char) => {
-                let symbol = parse_symbol(input, &mut i, allowed_identifier_characters);
-                token = Some(Token::Symbol { content: symbol });
-                i -= 1;
-            }
-            '(' => {
-                token = Some(Token::OpeningParenthesis {
-                    content: "(".to_owned(),
-                });
-            }
-            ')' => {
-                token = Some(Token::ClosingParenthesis {
-                    content: ")".to_owned(),
-                });
-            }
-            '\n' => {}
-            _ => {
-                panic!(
-                    "Unexpected character \"{}\" at position {}",
-                    current_char, i
-                )
-            }
-        }
-
-        if let Some(token) = token {
-            tokens.push(token);
-        }
-
-        i += 1;
-    }
-
-    tokens.push(Token::EOF);
-
-    tokens
+pub struct Lexer<'a> {
+    current_char_index: usize,
+    input: &'a str,
 }
 
-fn parse_string_literal(input: &str, index: &mut usize) -> String {
-    let mut output = String::new();
-
-    loop {
-        let current_char = input.chars().nth(*index).unwrap();
-        if current_char == '"' {
-            break;
+impl<'a> Lexer<'a> {
+    pub fn new(input: &str) -> Lexer {
+        Lexer {
+            current_char_index: 0,
+            input,
         }
-
-        output.push(current_char);
-        *index += 1;
     }
 
-    output
-}
+    pub fn next(&mut self) -> Token {
+        loop {
+            let current_char_option = self.input.chars().nth(self.current_char_index);
+            if current_char_option.is_none() {
+                return Token::EOF;
+            }
 
-fn parse_symbol(input: &str, index: &mut usize, allowed_identifier_characters: &str) -> String {
-    let mut output = String::new();
+            let current_char = current_char_option.unwrap();
 
-    loop {
-        let current_char = input.chars().nth(*index).unwrap();
-        if !allowed_identifier_characters.contains(current_char) {
-            break;
+            let allowed_identifier_characters =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+
+            let mut token: Option<Token> = None;
+
+            match current_char {
+                '"' => {
+                    self.current_char_index += 1;
+                    let string_literal =
+                        Self::parse_string_literal(self.input, &mut self.current_char_index);
+                    token = Some(Token::StringLiteral {
+                        content: string_literal,
+                    });
+                }
+                _ if allowed_identifier_characters.contains(current_char) => {
+                    let symbol = Self::parse_symbol(
+                        self.input,
+                        &mut self.current_char_index,
+                        allowed_identifier_characters,
+                    );
+                    token = Some(Token::Symbol { content: symbol });
+                    self.current_char_index -= 1;
+                }
+                '(' => {
+                    token = Some(Token::OpeningParenthesis {
+                        content: "(".to_owned(),
+                    });
+                }
+                ')' => {
+                    token = Some(Token::ClosingParenthesis {
+                        content: ")".to_owned(),
+                    });
+                }
+                '\n' | ' ' | ' ' => {}
+                _ => {
+                    panic!(
+                        "Unexpected character \"{}\" at position {}",
+                        current_char, self.current_char_index
+                    )
+                }
+            }
+
+            self.current_char_index += 1;
+
+            if let Some(token) = token {
+                return token;
+            }
         }
-
-        output.push(current_char);
-        *index += 1;
     }
 
-    output
+    fn parse_string_literal(input: &str, index: &mut usize) -> String {
+        let mut output = String::new();
+
+        loop {
+            let current_char = input.chars().nth(*index).unwrap();
+            if current_char == '"' {
+                break;
+            }
+
+            output.push(current_char);
+            *index += 1;
+        }
+
+        output
+    }
+
+    fn parse_symbol(input: &str, index: &mut usize, allowed_identifier_characters: &str) -> String {
+        let mut output = String::new();
+
+        loop {
+            let current_char = input.chars().nth(*index).unwrap();
+            if !allowed_identifier_characters.contains(current_char) {
+                break;
+            }
+
+            output.push(current_char);
+            *index += 1;
+        }
+
+        output
+    }
 }
