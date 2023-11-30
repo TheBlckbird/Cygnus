@@ -1,0 +1,21 @@
+program = { SOI ~ statement* ~ EOI }
+
+statement = { (function_call) ~ ";" }
+
+function_call =  { identifier ~ "(" ~ arguments? ~ ")" }
+argument      = _{ expression }
+arguments     =  { argument ~ ("," ~ argument)? }
+
+expression = _{ string }
+identifier =  { (ASCII_ALPHANUMERIC | "_")+ }
+
+string = ${ "\"" ~ inner ~ "\"" }
+inner  = @{ char* }
+char   =  {
+    !("\"" | "\\") ~ ANY
+  | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+  | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
+
+// Whitespace
+WHITESPACE = _{ WHITE_SPACE | NEWLINE }

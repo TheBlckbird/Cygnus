@@ -67,9 +67,9 @@ pub fn compiler(ast: Ast) -> Workflow {
 
     for node in ast.nodes {
         match node {
-            Expression::FunctionCall(function_call) => match function_call.function_name.as_str() {
+            Statement::FunctionCall(function_call) => match function_call.function_name.as_str() {
                 "print" => match &function_call.arguments[0] {
-                    Statement::Text(text) => workflow.w_f_workflow_actions.push(WorkflowAction {
+                    Expression::Text(text) => workflow.w_f_workflow_actions.push(WorkflowAction {
                         w_f_workflow_action_identifier: "is.workflow.actions.showresult".to_owned(),
                         w_f_workflow_action_parameters: Parameters {
                             text: Some(text.clone()),
