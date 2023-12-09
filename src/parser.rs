@@ -39,7 +39,55 @@ pub fn parser(input: &str) -> Ast {
         .unwrap();
 
     let mut ast = Ast::new();
-    dbg!(program);
+
+    for statement in program.into_inner() {
+        match statement.as_rule() {
+            Rule::statement => {
+                for statement_part in statement.into_inner() {
+                    match statement_part.as_rule() {
+                        Rule::function_call => {
+                            let mut function_call = FunctionCall {
+                                function_name: String::new(),
+                                arguments: Vec::new(),
+                            };
+
+                            for function_call_part in statement_part.into_inner() {
+                                match function_call_part.as_rule() {
+                                    Rule::identifier => {
+                                        function_call.function_name =
+                                            function_call_part.as_str().to_owned();
+                                    }
+                                    Rule::arguments => {
+                                        for argument in function_call_part.into_inner() {
+                                            match argument.as_rule() {
+                                                Rule::string => {
+                                                    function_call.arguments.push(Expression::Text(
+                                                        argument
+                                                            .into_inner()
+                                                            .next()
+                                                            .unwrap()
+                                                            .as_str()
+                                                            .to_owned(),
+                                                    ));
+                                                }
+                                                _ => unreachable!(),
+                                            }
+                                        }
+                                    }
+                                    _ => unreachable!(),
+                                }
+                            }
+
+                            ast.nodes.push(Statement::FunctionCall(function_call));
+                        }
+                        _ => unreachable!(),
+                    }
+                }
+            }
+            Rule::EOI => break,
+            _ => unreachable!(),
+        }
+    }
 
     ast
 }

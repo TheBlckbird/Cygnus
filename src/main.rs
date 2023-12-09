@@ -34,7 +34,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Arg::new("no-sign")
                 .short('n')
                 .long("no-sign")
-                .help("Disables automatic signing of the shortcut (Needed if your using another OS than MacOS)")
+                .help("Disables automatic signing of the shortcut (Needed if your using another OS than macOS)")
                 .action(ArgAction::SetTrue),
         )
         .get_matches();
@@ -59,7 +59,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let output = Command::new("sh")
             .arg("-c")
             .arg(format!(
-                "shortcuts sign --mode anyone -i {} -o {}",
+                "shortcuts sign -i {} -o {}",
                 unsigned_location.display(),
                 output_location.display()
             ))
