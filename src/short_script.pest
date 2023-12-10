@@ -1,13 +1,23 @@
 program = { SOI ~ statement* ~ EOI }
 
-statement = { (function_call) ~ ";" }
+statement = { ((function_call | macro_call) ~ ";") | macro_definition }
 
 function_call =  { identifier ~ "(" ~ arguments? ~ ")" }
 argument      = _{ expression }
 arguments     =  { argument ~ ("," ~ argument)? }
 
+macro_definition = {
+    identifier ~ "->" ~ "!" ~ "{" ~ macro_body ~ "}"
+}
+macro_body       = {
+    "identifier" ~ ":" ~ string ~ "," ~ "parameters" ~ ":" ~ dictionary_type ~ ","?
+}
+macro_call       = {
+    identifier ~ "!" ~ "(" ~ arguments ~ ")"
+}
+
 expression = _{ string }
-identifier =  { (ASCII_ALPHANUMERIC | "_")+ }
+identifier = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
 
 string = ${ "\"" ~ inner ~ "\"" }
 inner  = @{ char* }
@@ -17,5 +27,19 @@ char   =  {
   | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
 }
 
+type            = {
+    "String"
+  | "Number"
+  | "Date"
+  | "Data"
+  | "Boolean"
+  | "Array" ~ array_type
+  | "Dictionary" ~ dictionary_type
+}
+array_type      = { "[" ~ (type ~ ","?)* ~ "]" }
+dictionary_type = {
+    "{" ~ (identifier ~ ":" ~ type ~ ","?)* ~ "}"
+}
+
 // Whitespace
-WHITESPACE = _{ WHITE_SPACE | NEWLINE }
+WHITESPACE = _{ WHITE_SPACE | NEWLINE | " " | "\t" }
