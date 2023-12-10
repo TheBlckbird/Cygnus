@@ -3,7 +3,6 @@ use compiler::{compiler, Workflow};
 use parser::parser;
 use plist::to_file_binary;
 use std::{
-    env::temp_dir,
     fs,
     path::PathBuf,
     process::{exit, Command},

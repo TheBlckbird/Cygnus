@@ -43,3 +43,4 @@ dictionary_type = {
 
 // Whitespace
 WHITESPACE = _{ WHITE_SPACE | NEWLINE | " " | "\t" }
+COMMENT    = _{ "/*" ~ (!"*/" ~ ANY)* ~ "*/" | "//" }

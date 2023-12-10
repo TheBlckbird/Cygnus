@@ -1,6 +1,6 @@
 use crate::{
     error::error,
-    parser::{Ast, Expression, Statement},
+    parser::{Argument, Ast, Expression, Statement},
 };
 use plist::Value;
 use serde::{Deserialize, Serialize};
@@ -69,18 +69,21 @@ pub fn compiler(ast: Ast) -> Workflow {
         match node {
             Statement::FunctionCall(function_call) => match function_call.function_name.as_str() {
                 "print" => match &function_call.arguments[0] {
-                    Expression::Text(text) => workflow.w_f_workflow_actions.push(WorkflowAction {
+                    Argument::Text(text) => workflow.w_f_workflow_actions.push(WorkflowAction {
                         w_f_workflow_action_identifier: "is.workflow.actions.showresult".to_owned(),
                         w_f_workflow_action_parameters: Parameters {
                             text: Some(text.clone()),
                         },
                     }),
+                    _ => unreachable!(),
                 },
                 _ => error(format!(
                     "Unknown function \"{}\"",
                     function_call.function_name
                 )),
             },
+            Statement::MacroCall(macro_call) => {}
+            _ => {}
         }
     }
 
