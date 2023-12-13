@@ -95,67 +95,6 @@ pub fn parser(input: &str) -> Ast {
                                                         .to_owned();
                                                 }
                                                 Rule::macro_action_parameters => {
-                                                    // let mut dictionary = DictionaryType::new();
-
-                                                    // let entries = macro_body_part
-                                                    //     .into_inner()
-                                                    //     .next()
-                                                    //     .unwrap()
-                                                    //     .into_inner();
-
-                                                    // for entry in entries {
-                                                    //     let mut identifier = Identifier::new();
-                                                    //     let mut type_ = Type::String;
-
-                                                    //     for entry_part in entry.into_inner() {
-                                                    //         match entry_part.as_rule() {
-                                                    //             Rule::identifier => {
-                                                    //                 identifier = entry_part
-                                                    //                     .as_str()
-                                                    //                     .to_owned();
-                                                    //             }
-                                                    //             Rule::r#type => {
-                                                    //                 match entry_part
-                                                    //                     .as_str()
-                                                    //                     .to_lowercase()
-                                                    //                     .as_str()
-                                                    //                 {
-                                                    //                     "string" => {
-                                                    //                         type_ = Type::String;
-                                                    //                     }
-                                                    //                     "number" => {
-                                                    //                         type_ = Type::Number;
-                                                    //                     }
-                                                    //                     "date" => {
-                                                    //                         type_ = Type::Date;
-                                                    //                     }
-                                                    //                     "data" => {
-                                                    //                         type_ = Type::Data;
-                                                    //                     }
-                                                    //                     "boolean" => {
-                                                    //                         type_ = Type::Boolean;
-                                                    //                     }
-                                                    //                     // "Array" => {
-                                                    //                     //     type_ = Type::Array(
-                                                    //                     //         Vec::new(),
-                                                    //                     //     );
-                                                    //                     // }
-                                                    //                     // "Dictionary" => {
-                                                    //                     //     type_ =
-                                                    //                     //         Type::Dictionary(
-                                                    //                     //             Vec::new(),
-                                                    //                     //         );
-                                                    //                     // }
-                                                    //                     _ => unreachable!(),
-                                                    //                 }
-                                                    //             }
-                                                    //             _ => unreachable!(),
-                                                    //         }
-                                                    //     }
-
-                                                    //     dictionary.push_entry(identifier, type_);
-                                                    // }
-
                                                     let entries = macro_body_part
                                                         .into_inner()
                                                         .next()
