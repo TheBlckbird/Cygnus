@@ -1,72 +1,16 @@
+pub mod ast;
 mod parse_arguments;
+mod parse_types;
 
+use crate::parser::{ast::*, parse_arguments::parse_arguments};
 use pest::Parser;
 use pest_derive::Parser;
 
-use crate::parser::parse_arguments::parse_arguments;
+use self::{ast::Ast, parse_types::parse_dictionary_type};
 
 #[derive(Parser)]
 #[grammar = "short_script.pest"]
 struct ShortScriptParser;
-
-#[derive(Debug)]
-pub struct Ast {
-    pub nodes: Vec<Statement>,
-}
-
-impl Ast {
-    pub fn new() -> Ast {
-        Ast { nodes: vec![] }
-    }
-}
-
-#[derive(Debug)]
-pub enum Statement {
-    FunctionCall(FunctionCall),
-    MacroCall(MacroCall),
-    MacroDefinition(MacroDefinition),
-}
-
-#[derive(Debug)]
-pub enum Argument {
-    Expression(Expression),
-    Text(Text),
-}
-
-#[derive(Debug)]
-pub struct FunctionCall {
-    pub function_name: String,
-    pub arguments: Vec<Argument>,
-}
-
-#[derive(Debug)]
-pub struct MacroDefinition {
-    pub macro_name: String,
-    pub identifier: String,
-    pub parameters: Vec<String>,
-}
-
-#[derive(Debug)]
-pub struct MacroCall {
-    pub macro_name: String,
-    pub arguments: Vec<Argument>,
-}
-
-#[derive(Debug)]
-pub enum Expression {}
-
-pub type Identifier = String;
-pub type Text = String;
-
-pub enum Type {
-    String,
-    Number,
-    Date,
-    Data,
-    Boolean,
-    Array(Vec<Type>),
-    Dictionary(Vec<(Identifier, Type)>),
-}
 
 pub fn parser(input: &str) -> Ast {
     let program = ShortScriptParser::parse(Rule::program, input)
@@ -123,6 +67,113 @@ pub fn parser(input: &str) -> Ast {
 
                             ast.nodes.push(Statement::MacroCall(macro_call));
                         }
+                        Rule::macro_definition => {
+                            let mut macro_definition = MacroDefinition {
+                                macro_identifier: Identifier::new(),
+                                action_id: String::new(),
+                                action_parameters: DictionaryType::new(),
+                            };
+
+                            for macro_definition_part in statement_part.into_inner() {
+                                match macro_definition_part.as_rule() {
+                                    Rule::identifier => {
+                                        macro_definition.macro_identifier =
+                                            macro_definition_part.as_str().to_owned();
+                                    }
+                                    Rule::macro_body => {
+                                        for macro_body_part in macro_definition_part.into_inner() {
+                                            match macro_body_part.as_rule() {
+                                                Rule::macro_action_id => {
+                                                    macro_definition.action_id = macro_body_part
+                                                        .into_inner()
+                                                        .next()
+                                                        .unwrap()
+                                                        .into_inner()
+                                                        .next()
+                                                        .unwrap()
+                                                        .as_str()
+                                                        .to_owned();
+                                                }
+                                                Rule::macro_action_parameters => {
+                                                    // let mut dictionary = DictionaryType::new();
+
+                                                    // let entries = macro_body_part
+                                                    //     .into_inner()
+                                                    //     .next()
+                                                    //     .unwrap()
+                                                    //     .into_inner();
+
+                                                    // for entry in entries {
+                                                    //     let mut identifier = Identifier::new();
+                                                    //     let mut type_ = Type::String;
+
+                                                    //     for entry_part in entry.into_inner() {
+                                                    //         match entry_part.as_rule() {
+                                                    //             Rule::identifier => {
+                                                    //                 identifier = entry_part
+                                                    //                     .as_str()
+                                                    //                     .to_owned();
+                                                    //             }
+                                                    //             Rule::r#type => {
+                                                    //                 match entry_part
+                                                    //                     .as_str()
+                                                    //                     .to_lowercase()
+                                                    //                     .as_str()
+                                                    //                 {
+                                                    //                     "string" => {
+                                                    //                         type_ = Type::String;
+                                                    //                     }
+                                                    //                     "number" => {
+                                                    //                         type_ = Type::Number;
+                                                    //                     }
+                                                    //                     "date" => {
+                                                    //                         type_ = Type::Date;
+                                                    //                     }
+                                                    //                     "data" => {
+                                                    //                         type_ = Type::Data;
+                                                    //                     }
+                                                    //                     "boolean" => {
+                                                    //                         type_ = Type::Boolean;
+                                                    //                     }
+                                                    //                     // "Array" => {
+                                                    //                     //     type_ = Type::Array(
+                                                    //                     //         Vec::new(),
+                                                    //                     //     );
+                                                    //                     // }
+                                                    //                     // "Dictionary" => {
+                                                    //                     //     type_ =
+                                                    //                     //         Type::Dictionary(
+                                                    //                     //             Vec::new(),
+                                                    //                     //         );
+                                                    //                     // }
+                                                    //                     _ => unreachable!(),
+                                                    //                 }
+                                                    //             }
+                                                    //             _ => unreachable!(),
+                                                    //         }
+                                                    //     }
+
+                                                    //     dictionary.push_entry(identifier, type_);
+                                                    // }
+
+                                                    let entries = macro_body_part
+                                                        .into_inner()
+                                                        .next()
+                                                        .unwrap();
+
+                                                    macro_definition.action_parameters =
+                                                        parse_dictionary_type(entries);
+                                                }
+                                                _ => unreachable!(),
+                                            }
+                                        }
+                                    }
+                                    _ => unreachable!(),
+                                }
+                            }
+
+                            ast.macros.push(macro_definition);
+                        }
                         _ => unreachable!(),
                     }
                 }
@@ -132,6 +183,6 @@ pub fn parser(input: &str) -> Ast {
         }
     }
 
-    println!("{:#?}", ast);
+    dbg!(&ast);
     ast
 }

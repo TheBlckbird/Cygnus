@@ -6,13 +6,16 @@ function_call =  { identifier ~ "(" ~ arguments? ~ ")" }
 argument      = _{ expression }
 arguments     =  { argument ~ ("," ~ argument)? }
 
-macro_definition = {
+macro_definition        = {
     identifier ~ "->" ~ "!" ~ "{" ~ macro_body ~ "}"
 }
-macro_body       = {
-    "identifier" ~ ":" ~ string ~ "," ~ "parameters" ~ ":" ~ dictionary_type ~ ","?
+macro_body              = {
+    // "id" ~ ":" ~ string ~ "," ~ "parameters" ~ ":" ~ dictionary_type ~ ","?
+    macro_action_id ~ "," ~ macro_action_parameters ~ ","?
 }
-macro_call       = {
+macro_action_id         = { "id" ~ ":" ~ string }
+macro_action_parameters = { "parameters" ~ ":" ~ dictionary_type }
+macro_call              = {
     identifier ~ "!" ~ "(" ~ arguments ~ ")"
 }
 
@@ -27,18 +30,21 @@ char   =  {
   | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
 }
 
-type            = {
-    "String"
-  | "Number"
-  | "Date"
-  | "Data"
-  | "Boolean"
-  | "Array" ~ array_type
-  | "Dictionary" ~ dictionary_type
+type                      = {
+    "string"
+  | "number"
+  | "date"
+  | "data"
+  | "boolean"
+  | "array" ~ array_type
+  | "dictionary" ~ dictionary_type
 }
-array_type      = { "[" ~ (type ~ ","?)* ~ "]" }
-dictionary_type = {
-    "{" ~ (identifier ~ ":" ~ type ~ ","?)* ~ "}"
+array_type                = { "[" ~ (type ~ ("," ~ type)* ~ ","?)? ~ "]" }
+dictionary_type           = {
+    "{" ~ (dictionary_type_key_value ~ ("," ~ dictionary_type_key_value)* ~ ","?)? ~ "}"
+}
+dictionary_type_key_value = {
+    identifier ~ ":" ~ type
 }
 
 // Whitespace

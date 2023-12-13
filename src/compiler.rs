@@ -1,7 +1,4 @@
-use crate::{
-    error::error,
-    parser::{Argument, Ast, Expression, Statement},
-};
+use crate::{error::error, parser::ast::*};
 use plist::Value;
 use serde::{Deserialize, Serialize};
 
