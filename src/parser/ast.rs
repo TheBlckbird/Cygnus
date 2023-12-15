@@ -23,7 +23,7 @@ pub enum Statement {
 #[derive(Debug)]
 pub enum Argument {
     Expression(Expression),
-    Text(Text),
+    String(String),
 }
 
 #[derive(Debug)]
@@ -49,7 +49,6 @@ pub struct MacroCall {
 pub enum Expression {}
 
 pub type Identifier = String;
-pub type Text = String;
 
 #[derive(Debug)]
 pub enum Type {

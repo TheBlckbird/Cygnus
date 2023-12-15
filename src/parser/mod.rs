@@ -4,7 +4,10 @@ mod parse_types;
 
 use std::process::exit;
 
-use crate::parser::{ast::*, parse_arguments::parse_arguments};
+use crate::{
+    error::error,
+    parser::{ast::*, parse_arguments::parse_arguments},
+};
 use pest::Parser;
 use pest_derive::Parser;
 
@@ -58,18 +61,6 @@ pub fn parser(input: &str) -> Ast {
                             for macro_call_part in statement_part.into_inner() {
                                 match macro_call_part.as_rule() {
                                     Rule::identifier => {
-                                        if ast
-                                            .macros
-                                            .iter()
-                                            .any(|m| m.macro_identifier == macro_call_part.as_str())
-                                        {
-                                            // TODO:TODO: Implement proper error handling!
-                                            eprintln!(
-                                                "Macro \"{}\" is defined multiple times!",
-                                                macro_call_part.as_str()
-                                            );
-                                            exit(1);
-                                        }
                                         macro_call.macro_name = macro_call_part.as_str().to_owned();
                                     }
                                     Rule::arguments => {
@@ -91,6 +82,17 @@ pub fn parser(input: &str) -> Ast {
                             for macro_definition_part in statement_part.into_inner() {
                                 match macro_definition_part.as_rule() {
                                     Rule::identifier => {
+                                        if ast.macros.iter().any(|m| {
+                                            m.macro_identifier == macro_definition_part.as_str()
+                                        }) {
+                                            // TODO:TODO: Implement proper error handling!
+                                            dbg!(&ast.macros);
+                                            error(format!(
+                                                "Macro \"{}\" is defined multiple times!",
+                                                macro_definition_part.as_str()
+                                            ));
+                                        }
+
                                         macro_definition.macro_identifier =
                                             macro_definition_part.as_str().to_owned();
                                     }

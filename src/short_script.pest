@@ -49,4 +49,4 @@ dictionary_type_key_value = {
 
 // Whitespace
 WHITESPACE = _{ WHITE_SPACE | NEWLINE | " " | "\t" }
-COMMENT    = _{ "/*" ~ (!"*/" ~ ANY)* ~ "*/" | "//" }
+COMMENT    = _{ "/*" ~ (!"*/" ~ ANY)* ~ "*/" | "//" ~ (!NEWLINE ~ ANY)* }

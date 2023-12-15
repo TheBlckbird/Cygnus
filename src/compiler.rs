@@ -66,12 +66,15 @@ pub fn compiler(ast: Ast) -> Workflow {
         match node {
             Statement::FunctionCall(function_call) => match function_call.function_name.as_str() {
                 "print" => match &function_call.arguments[0] {
-                    Argument::Text(text) => workflow.w_f_workflow_actions.push(WorkflowAction {
-                        w_f_workflow_action_identifier: "is.workflow.actions.showresult".to_owned(),
-                        w_f_workflow_action_parameters: Parameters {
-                            text: Some(text.clone()),
-                        },
-                    }),
+                    Argument::String(string) => {
+                        workflow.w_f_workflow_actions.push(WorkflowAction {
+                            w_f_workflow_action_identifier: "is.workflow.actions.showresult"
+                                .to_owned(),
+                            w_f_workflow_action_parameters: Parameters {
+                                text: Some(string.clone()),
+                            },
+                        })
+                    }
                     _ => unreachable!(),
                 },
                 _ => error(format!(
@@ -79,7 +82,10 @@ pub fn compiler(ast: Ast) -> Workflow {
                     function_call.function_name
                 )),
             },
-            Statement::MacroCall(macro_call) => {}
+            Statement::MacroCall(macro_call) => {
+                // println!("{macro_call:#?}");
+            }
+            Statement::MacroDefinition(macro_definition) => {}
             _ => {}
         }
     }
