@@ -2,6 +2,8 @@ pub mod ast;
 mod parse_arguments;
 mod parse_types;
 
+use std::process::exit;
+
 use crate::parser::{ast::*, parse_arguments::parse_arguments};
 use pest::Parser;
 use pest_derive::Parser;
@@ -56,6 +58,18 @@ pub fn parser(input: &str) -> Ast {
                             for macro_call_part in statement_part.into_inner() {
                                 match macro_call_part.as_rule() {
                                     Rule::identifier => {
+                                        if ast
+                                            .macros
+                                            .iter()
+                                            .any(|m| m.macro_identifier == macro_call_part.as_str())
+                                        {
+                                            // TODO:TODO: Implement proper error handling!
+                                            eprintln!(
+                                                "Macro \"{}\" is defined multiple times!",
+                                                macro_call_part.as_str()
+                                            );
+                                            exit(1);
+                                        }
                                         macro_call.macro_name = macro_call_part.as_str().to_owned();
                                     }
                                     Rule::arguments => {
