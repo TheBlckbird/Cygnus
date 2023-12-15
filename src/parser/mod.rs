@@ -16,7 +16,7 @@ struct ShortScriptParser;
 
 pub fn parser(input: &str) -> Ast {
     let program = ShortScriptParser::parse(Rule::program, input)
-        .unwrap_or_else(|e| panic!("{}", e))
+        .unwrap_or_else(|e| panic!("{e}"))
         .next()
         .unwrap();
 
