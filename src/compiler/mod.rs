@@ -125,16 +125,6 @@ pub fn compiler(ast: Ast) -> Workflow {
                 for (index, argument) in macro_call.arguments.iter().enumerate() {
                     match argument {
                         Argument::String(string) => {
-                            // if macro_definition.unwrap().action_parameters.entries[index].1
-                            //     == Type::String
-                            // {
-                            // } else {
-                            //     println!(
-                            //         "{string}: {:?}",
-                            //         macro_definition.unwrap().action_parameters.entries[index].1
-                            //     );
-                            // }
-
                             let (expected_argument_identifier, expected_type) =
                                 &macro_definition.unwrap().action_arguments.entries[index];
 
