@@ -76,7 +76,7 @@ pub fn parser(input: &str) -> Ast {
                             let mut macro_definition = MacroDefinition {
                                 macro_identifier: Identifier::new(),
                                 action_id: String::new(),
-                                action_parameters: DictionaryType::new(),
+                                action_arguments: DictionaryType::new(),
                             };
 
                             for macro_definition_part in statement_part.into_inner() {
@@ -116,7 +116,7 @@ pub fn parser(input: &str) -> Ast {
                                                         .next()
                                                         .unwrap();
 
-                                                    macro_definition.action_parameters =
+                                                    macro_definition.action_arguments =
                                                         parse_dictionary_type(entries);
                                                 }
                                                 _ => unreachable!(),
@@ -138,6 +138,6 @@ pub fn parser(input: &str) -> Ast {
         }
     }
 
-    dbg!(&ast);
+    // dbg!(&ast);
     ast
 }
