@@ -3,7 +3,7 @@ mod parse_arguments;
 mod parse_statements;
 mod parse_types;
 
-use crate::parser::ast::*;
+use crate::frontend::ast::*;
 use pest::Parser;
 use pest_derive::Parser;
 

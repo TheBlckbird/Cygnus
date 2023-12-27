@@ -1,6 +1,6 @@
+use backend::{compiler, Workflow};
 use clap::{arg, command, value_parser, Arg, ArgAction};
-use compiler::{compiler, Workflow};
-use parser::parser;
+use frontend::parser;
 use plist::to_file_binary;
 use std::{
     fs,
@@ -9,10 +9,10 @@ use std::{
 };
 use tempfile::tempdir;
 
-mod compiler;
+mod backend;
 mod error;
 // mod new_action;
-mod parser;
+mod frontend;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let matches = command!()

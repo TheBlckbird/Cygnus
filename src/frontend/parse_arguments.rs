@@ -1,5 +1,5 @@
 use super::Argument;
-use crate::parser::Rule;
+use crate::frontend::Rule;
 use pest::iterators::Pair;
 
 pub fn parse_arguments(call_part: Pair<Rule>) -> Vec<Argument> {
