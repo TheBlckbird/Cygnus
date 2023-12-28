@@ -1,4 +1,4 @@
-use crate::frontend::ast::{Argument, DictionaryType};
+use crate::frontend::ast::{Argument, AsType, DictionaryType};
 
 pub fn arguments_match_definition(
     call_arguments: &Vec<Argument>,

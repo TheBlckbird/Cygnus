@@ -1,5 +1,9 @@
 use std::fmt::Display;
 
+pub trait AsType {
+    fn as_type(&self) -> Type;
+}
+
 #[derive(Debug)]
 pub struct Ast {
     pub nodes: Vec<Statement>,
@@ -27,8 +31,8 @@ pub enum Argument {
     String(String),
 }
 
-impl Argument {
-    pub fn as_type(&self) -> Type {
+impl AsType for Argument {
+    fn as_type(&self) -> Type {
         match self {
             Argument::String(_) => Type::String,
             _ => unreachable!(),
