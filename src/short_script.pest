@@ -1,0 +1,52 @@
+program = { SOI ~ statement* ~ EOI }
+
+statement = { ((function_call | action_call) ~ ";") | action_definition }
+
+function_call =  { identifier ~ "(" ~ arguments? ~ ")" }
+argument      = _{ expression }
+arguments     =  { (argument ~ ("," ~ argument)?)? }
+
+action_definition = {
+    identifier ~ "->" ~ "#" ~ "{" ~ action_body ~ "}"
+}
+action_body       = {
+    // "id" ~ ":" ~ string ~ "," ~ "parameters" ~ ":" ~ dictionary_type ~ ","?
+    action_id ~ "," ~ action_parameters ~ ","?
+}
+action_id         = { "id" ~ ":" ~ string }
+action_parameters = { "parameters" ~ ":" ~ dictionary_type }
+action_call       = {
+    identifier ~ "#" ~ "(" ~ arguments ~ ")"
+}
+
+expression = _{ string }
+identifier = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
+
+string = ${ "\"" ~ inner ~ "\"" }
+inner  = @{ char* }
+char   =  {
+    !("\"" | "\\") ~ ANY
+  | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+  | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
+
+type                      = {
+    "string"
+  | "number"
+  | "date"
+  | "data"
+  | "boolean"
+  | "array" ~ array_type
+  | "dictionary" ~ dictionary_type
+}
+array_type                = { "[" ~ (type ~ ("," ~ type)* ~ ","?)? ~ "]" }
+dictionary_type           = {
+    "{" ~ (dictionary_type_key_value ~ ("," ~ dictionary_type_key_value)* ~ ","?)? ~ "}"
+}
+dictionary_type_key_value = {
+    identifier ~ ":" ~ type
+}
+
+// Whitespace
+WHITESPACE = _{ WHITE_SPACE | NEWLINE | " " | "\t" }
+COMMENT    = _{ "/*" ~ (!"*/" ~ ANY)* ~ "*/" | "//" ~ (!NEWLINE ~ ANY)* }
