@@ -6,7 +6,8 @@ I will create a guide when I have enough features.
 
 ## Plans for the future
 
-The finished language should look something like this, but I don’t think I’ll get that far:
+The finished language should look something like the following, but I don’t think I’ll get that far.
+Any changes to this sample code are welcome.
 
 ```
 print => #{
