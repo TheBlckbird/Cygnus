@@ -19,26 +19,38 @@ action_call       = {
     identifier ~ "#" ~ "(" ~ arguments ~ ")"
 }
 
-expression = _{ string }
-identifier = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
+expression            =  { string | non_string_expression }
+non_string_expression =  { identifier }
+identifier            = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
 
-string = ${ "\"" ~ inner ~ "\"" }
-inner  = @{ char* }
-char   =  {
-    !("\"" | "\\") ~ ANY
+// concatenated_string =  { expression ~ (".." ~ (expression))* }
+string              =  {
+    (literal_string | non_string_expression) ~ (".." ~ (literal_string | non_string_expression))*
+}
+literal_string      = ${ "\"" ~ inner ~ "\"" }
+inner               = @{ char* }
+char                =  {
+    !("\"" | "\\") ~ (ANY ~ !("￼" /* Object Replacement Character */
+  ))
   | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
   | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
 }
 
 type                      = {
-    "string"
-  | "number"
-  | "date"
-  | "data"
-  | "boolean"
-  | "array" ~ array_type
-  | "dictionary" ~ dictionary_type
+    string_type
+  | number_type
+  | date_type
+  | data_type
+  | boolean_type
+  | array_type
+  |  dictionary_type // TODO: Change to `dict`
 }
+string_type               = { "string" }
+number_type               = { "number" }
+date_type                 = { "date" }
+data_type                 = { "data" }
+boolean_type              = { "boolean" }
+text_type                 = { "text" }
 array_type                = { "[" ~ (type ~ ("," ~ type)* ~ ","?)? ~ "]" }
 dictionary_type           = {
     "{" ~ (dictionary_type_key_value ~ ("," ~ dictionary_type_key_value)* ~ ","?)? ~ "}"

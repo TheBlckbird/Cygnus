@@ -1,3 +1,5 @@
+#![feature(let_chains)]
+
 use anyhow::Result;
 use backend::{compiler, Workflow};
 use clap::{arg, command, value_parser, Arg, ArgAction};
@@ -10,12 +12,12 @@ use std::{
 };
 use tempfile::tempdir;
 
-use crate::error::print_error;
+use crate::{error::print_error, middleend::middleend};
 
 mod backend;
 mod error;
-// mod new_action;
 mod frontend;
+mod middleend;
 
 fn main() -> Result<()> {
     let matches = command!()
@@ -31,7 +33,6 @@ fn main() -> Result<()> {
             .required(true)
             .value_parser(value_parser!(PathBuf)),
         )
-        // .arg(arg!(-n --no_sign "Disables automatic signing of the shortcut (Needed if your using another OS than MacOS)").action(ArgAction::SetTrue))
         .arg(
             Arg::new("no-sign")
                 .short('n')
@@ -48,7 +49,7 @@ fn main() -> Result<()> {
     let file_content = fs::read_to_string(input_file).unwrap();
     let maybe_ast = parser(file_content.as_str());
 
-    let ast = match maybe_ast {
+    let mut ast = match maybe_ast {
         Ok(ast) => ast,
         Err(parser_errors) => {
             let mut error_out = String::new();
@@ -61,6 +62,8 @@ fn main() -> Result<()> {
             exit(1);
         }
     };
+
+    middleend(&mut ast);
 
     let workflow = compiler(ast);
 

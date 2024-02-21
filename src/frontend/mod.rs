@@ -1,11 +1,3 @@
-pub mod ast;
-mod parse_arguments;
-mod parse_statements;
-mod parse_types;
-mod type_checker;
-
-use std::error::Error;
-
 use self::{
     ast::Ast,
     parse_statements::{parse_action_call, parse_action_definition, parse_function_call},
@@ -14,6 +6,14 @@ use self::{
 use crate::frontend::ast::*;
 use pest::Parser;
 use pest_derive::Parser;
+use std::error::Error;
+
+pub mod ast;
+mod parse_arguments;
+mod parse_statements;
+mod parse_string;
+mod parse_types;
+mod type_checker;
 
 #[derive(Parser)]
 #[grammar = "short_script.pest"]
@@ -64,6 +64,8 @@ pub fn parser(input: &str) -> Result<Ast, Vec<Box<impl Error>>> {
 
         return Err(errors);
     }
+
+    // dbg!(&ast);
 
     Ok(ast)
 }

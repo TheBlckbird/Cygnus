@@ -1,11 +1,12 @@
 use std::cmp::Ordering;
 
-use crate::frontend::ast::{Arguments, AsType, DictionaryType};
+use crate::frontend::ast::DictionaryType;
 
-use super::TypeCheckerError;
+use super::{Expression, Position, TypeCheckerError};
 
 pub fn arguments_match_definition(
-    call_arguments: &Arguments,
+    call_arguments: &Vec<Expression>,
+    arguments_position: &Position,
     definition_parameters: &DictionaryType,
 ) -> Result<(), Vec<Box<TypeCheckerError>>> {
     let mut errors = vec![];
@@ -16,7 +17,7 @@ pub fn arguments_match_definition(
             #[allow(clippy::needless_range_loop)]
             for i in definition_parameters.len()..call_arguments.len() {
                 errors.push(Box::new(TypeCheckerError::UnnecessaryArgument {
-                    position: *call_arguments.arguments[i].position(),
+                    position: *call_arguments[i].position(),
                 }));
             }
         }
@@ -24,9 +25,9 @@ pub fn arguments_match_definition(
         {
             #[allow(clippy::needless_range_loop)]
             for i in call_arguments.len()..definition_parameters.len() {
-                let position = match call_arguments.arguments.last() {
+                let position = match call_arguments.last() {
                     Some(item) => *item.position(),
-                    None => call_arguments.position,
+                    None => *arguments_position,
                 };
 
                 errors.push(Box::new(TypeCheckerError::MissingArgument {

@@ -3,9 +3,7 @@ use pest::iterators::Pair;
 use crate::error::print_error;
 
 use super::{
-    ast::{
-        ActionCall, ActionDefinition, Arguments, DictionaryType, FunctionCall, Identifier, Position,
-    },
+    ast::{ActionCall, ActionDefinition, DictionaryType, FunctionCall, Identifier, Position},
     parse_arguments::parse_arguments,
     parse_types::parse_dictionary_type,
     Rule,
@@ -14,7 +12,7 @@ use super::{
 pub fn parse_function_call(statement_part: Pair<Rule>) -> FunctionCall {
     let mut function_call = FunctionCall {
         function_name: Identifier::new(),
-        arguments: Arguments::new_blank(),
+        arguments: vec![],
         position: Position::from(statement_part.line_col()),
     };
 
@@ -36,7 +34,7 @@ pub fn parse_function_call(statement_part: Pair<Rule>) -> FunctionCall {
 pub fn parse_action_call(statement_part: Pair<Rule>) -> ActionCall {
     let mut action_call = ActionCall {
         action_name: Identifier::new(),
-        arguments: Arguments::new_blank(),
+        arguments: vec![],
         position: Position::from(statement_part.line_col()),
     };
 

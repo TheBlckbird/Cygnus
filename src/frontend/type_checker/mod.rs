@@ -33,6 +33,7 @@ pub fn type_checker(ast: &Ast) -> Result<(), Vec<Box<TypeCheckerError>>> {
 
                 let arguments_result = arguments_match_definition(
                     &action_call.arguments,
+                    &action_call.position,
                     &action_definition.action_arguments,
                 );
 

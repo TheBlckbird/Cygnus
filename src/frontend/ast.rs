@@ -1,9 +1,4 @@
 use std::fmt::Display;
-use std::slice::{Iter, IterMut};
-
-pub trait AsType {
-    fn as_type(&self) -> Type;
-}
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub struct Position {
@@ -53,66 +48,7 @@ pub enum Statement {
     ActionCall(ActionCall),
 }
 
-#[derive(Debug)]
-pub struct Arguments {
-    pub position: Position,
-    pub arguments: Vec<Argument>,
-    index: usize,
-}
-
-impl Arguments {
-    pub fn new(position: Position) -> Self {
-        Self {
-            position,
-            arguments: Vec::new(),
-            index: 0,
-        }
-    }
-
-    pub fn new_blank() -> Self {
-        Self {
-            position: Position::new(0, 0),
-            arguments: Vec::new(),
-            index: 0,
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.arguments.len()
-    }
-
-    pub fn iter(&self) -> Iter<'_, Argument> {
-        self.arguments.iter()
-    }
-
-    pub fn iter_mut(&mut self) -> IterMut<'_, Argument> {
-        self.arguments.iter_mut()
-    }
-}
-
-#[derive(Debug)]
-pub enum Argument {
-    Expression(Expression, Position),
-    String(String, Position),
-}
-
-impl Argument {
-    pub fn position(&self) -> &Position {
-        match self {
-            Argument::Expression(_, pos) => pos,
-            Argument::String(_, pos) => pos,
-        }
-    }
-}
-
-impl AsType for Argument {
-    fn as_type(&self) -> Type {
-        match self {
-            Argument::String(_, _) => Type::String,
-            _ => unreachable!(),
-        }
-    }
-}
+pub type Arguments = Vec<Expression>;
 
 #[derive(Debug)]
 pub struct FunctionCall {
@@ -137,7 +73,37 @@ pub struct ActionCall {
 }
 
 #[derive(Debug)]
-pub enum Expression {}
+pub struct StringNode(pub Vec<Expression>, Position);
+
+impl StringNode {
+    pub fn new(position: Position) -> Self {
+        Self(Default::default(), position)
+    }
+
+    pub fn position(&self) -> &Position {
+        &self.1
+    }
+}
+
+#[derive(Debug)]
+pub enum Expression {
+    String(StringNode),
+    StringLiteral(String),
+}
+
+impl Expression {
+    pub fn position(&self) -> &Position {
+        match self {
+            Expression::String(string_node) => &string_node.1,
+        }
+    }
+
+    pub fn as_type(&self) -> Type {
+        match self {
+            Expression::String(_) => Type::String,
+        }
+    }
+}
 
 pub type Identifier = String;
 

@@ -44,7 +44,7 @@ pub fn parse_array_type(array: Pair<Rule>) -> ArrayType {
 }
 
 pub fn parse_type(type_: Pair<Rule>) -> Type {
-    return match type_.as_str() {
+    match type_.as_str() {
         "string" => Type::String,
         "number" => Type::Number,
         "date" => Type::Date,
@@ -57,5 +57,5 @@ pub fn parse_type(type_: Pair<Rule>) -> Type {
             Type::Dictionary(parse_dictionary_type(type_.into_inner().next().unwrap()))
         }
         _ => unreachable!(),
-    };
+    }
 }

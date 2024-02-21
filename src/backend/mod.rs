@@ -1,3 +1,5 @@
+mod compile_string;
+
 use crate::{error::print_error, frontend::ast::*};
 use plist::{Dictionary, Value};
 use serde::{Deserialize, Serialize};
@@ -107,16 +109,16 @@ pub fn compiler(ast: Ast) -> Workflow {
 
                 for (index, argument) in action_call.arguments.iter().enumerate() {
                     match argument {
-                        Argument::String(string, _) => {
+                        Expression::String(string) => {
+                            todo!("String to action parameter conversion");
+
                             let (expected_argument_identifier, expected_type, _) =
                                 &action_definition.unwrap().action_arguments.entries[index];
 
-                            if argument.as_type() == *expected_type {
-                                action.parameters.insert(
-                                    expected_argument_identifier.to_string(),
-                                    Value::String(string.to_string()),
-                                );
-                            }
+                            // action.parameters.insert(
+                            //     expected_argument_identifier.to_string(),
+                            //     Value::String(string.to_string()),
+                            // );
                         }
                         _ => unreachable!(),
                     }
